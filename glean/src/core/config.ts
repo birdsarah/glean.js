@@ -27,6 +27,8 @@ export interface ConfigurationInterface {
   plugins?: Plugin[],
   // The HTTP client implementation to use for uploading pings.
   httpClient?: Uploader,
+  // The LocalStorage DB Handle
+  dbHandle?: LocalStorage.DatabaseHandle,
 }
 
 // Important: the `Configuration` should only be used internally by the Glean singleton.
@@ -41,10 +43,13 @@ export class Configuration implements ConfigurationInterface {
   debug: DebugOptions;
   // The HTTP client implementation to use for uploading pings.
   httpClient?: Uploader;
+  // The LocalStorage DB Handle
+  dbHandle?: LocalStorage.DatabaseHandle;
 
   constructor(config?: ConfigurationInterface) {
     this.appBuild = config?.appBuild;
     this.appDisplayVersion = config?.appDisplayVersion;
+    this.dbHandle = config?.dbHandle;
 
     this.debug = Configuration.sanitizeDebugOptions(config?.debug);
 

@@ -32,6 +32,7 @@ export class Context {
   // The following group of properties are all set on Glean.initialize
   // Attempting to get them before they are set will log an error.
   private _uploadEnabled!: boolean;
+  private _dbHandle!: LocalStorage.DatabaseHandle | undefined;
   private _metricsDatabase!: MetricsDatabase;
   private _eventsDatabase!: EventsDatabase;
   private _pingsDatabase!: PingsDatabase;
@@ -87,6 +88,14 @@ export class Context {
 
   static set uploadEnabled(upload: boolean) {
     Context.instance._uploadEnabled = upload;
+  }
+
+  static set dbHandle(dbHandle: LocalStorage.DatabaseHandle | undefined) {
+    Context.instance._dbHandle = dbHandle;
+  }
+
+  static get dbHandle(): LocalStorage.DatabaseHandle | undefined {
+    return Context.instance._dbHandle;
   }
 
   static get metricsDatabase(): MetricsDatabase {

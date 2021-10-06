@@ -8,15 +8,9 @@ import type { JSONObject, JSONValue } from "../../core/utils.js";
 import { getValueFromNestedObject, updateNestedObject } from "../../core/storage/utils.js";
 import { isObject, isUndefined } from "../../core/utils.js";
 import log, { LoggingLevel } from "../../core/log.js";
+import { Context } from "../../core/context.js";
 
 const LOG_TAG = "platform.qt.Storage";
-// The name of the file that will hold the SQLite database.
-const DATABASE_NAME = "Glean";
-// Estimated size of database file.
-// This estimate is calculated by (rounding off and)
-// doubling the 95th percentile  of glean-core's database size on Android (150Kb).
-// https://glam.telemetry.mozilla.org/fenix/probe/glean_database_size/explore?app_id=release&timeHorizon=ALL
-const ESTIMATED_DATABASE_SIZE = 150 * 2 * 10**3; // 300Kb in bytes
 // Since we cannot have nesting in SQL databases,
 // we will have a database with only two columns: `key` and `value`.
 // The `key` column will contain the StorageIndex as a string, joined by SEPARATOR.
@@ -106,42 +100,20 @@ class QMLStore implements Store {
 
   constructor(
     private tableName: string,
-    private name: string = DATABASE_NAME
   ) {
     this.initialized = this._executeQuery(
       `CREATE TABLE IF NOT EXISTS ${tableName}(key VARCHAR(255), value VARCHAR(255));`
     );
     this.logTag = `${LOG_TAG}.${tableName}`;
+    this.dbHandle = Context.dbHandle;
   }
 
   private _createKeyFromIndex(index: StorageIndex) {
     return index.join(SEPARATOR);
   }
 
-  /**
-   * Best effort at getting the database handle.
-   *
-   * @returns The database handle or `undefined`.
-   */
-  private get _dbHandle(): LocalStorage.DatabaseHandle | undefined {
-    try {
-      const handle = LocalStorage.LocalStorage.openDatabaseSync(
-        this.name, "1.0", `${this.name} Storage`, ESTIMATED_DATABASE_SIZE
-      );
-      this.dbHandle = handle;
-    } catch(e) {
-      log(
-        this.logTag,
-        ["Error while attempting to access LocalStorage.\n", JSON.stringify(e)],
-        LoggingLevel.Debug
-      );
-    } finally {
-      return this.dbHandle;
-    }
-  }
-
   protected _executeQuery(query: string): Promise<LocalStorage.QueryResult | undefined> {
-    const handle = this._dbHandle;
+    const handle = this.dbHandle;
 
     return new Promise((resolve, reject) => {
       try {
