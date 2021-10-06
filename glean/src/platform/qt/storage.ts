@@ -95,7 +95,6 @@ function queryResultToJSONObject(
 
 class QMLStore implements Store {
   protected initialized: Promise<unknown>;
-  private dbHandle?: LocalStorage.DatabaseHandle;
   private logTag: string;
 
   constructor(
@@ -105,7 +104,6 @@ class QMLStore implements Store {
       `CREATE TABLE IF NOT EXISTS ${tableName}(key VARCHAR(255), value VARCHAR(255));`
     );
     this.logTag = `${LOG_TAG}.${tableName}`;
-    this.dbHandle = Context.dbHandle;
   }
 
   private _createKeyFromIndex(index: StorageIndex) {
@@ -113,7 +111,9 @@ class QMLStore implements Store {
   }
 
   protected _executeQuery(query: string): Promise<LocalStorage.QueryResult | undefined> {
-    const handle = this.dbHandle;
+    log(this.logTag, [`Executing LocalStorage query: ${query}.`,], LoggingLevel.Debug);
+    const handle = Context.dbHandle;
+    log(this.logTag, ["Have handle",], LoggingLevel.Debug);
 
     return new Promise((resolve, reject) => {
       try {
@@ -154,6 +154,7 @@ class QMLStore implements Store {
   }
 
   async get(index: StorageIndex = []): Promise<JSONValue | undefined> {
+    log(this.logTag, [ "At start of Get", ], LoggingLevel.Info);
     if (index.length === 0) {
       return this._getWholeStore();
     }

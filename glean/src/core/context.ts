@@ -91,10 +91,12 @@ export class Context {
   }
 
   static set dbHandle(dbHandle: LocalStorage.DatabaseHandle | undefined) {
+    log(LOG_TAG, [ "Set dbHandle", ], LoggingLevel.Debug);
     Context.instance._dbHandle = dbHandle;
   }
 
   static get dbHandle(): LocalStorage.DatabaseHandle | undefined {
+    log(LOG_TAG, [ "Get dbHandle", ], LoggingLevel.Debug);
     return Context.instance._dbHandle;
   }
 

@@ -218,7 +218,7 @@ class Glean {
     Context.debugOptions = correctConfig.debug;
     Glean.instance._config = correctConfig;
 
-    Context.dbHandle = correctConfig.dbHandle;
+    Context.dbHandle = config?.dbHandle;
     Context.metricsDatabase = new MetricsDatabase(Glean.platform.Storage);
     Context.eventsDatabase = new EventsDatabase(Glean.platform.Storage);
     Context.pingsDatabase = new PingsDatabase(Glean.platform.Storage);

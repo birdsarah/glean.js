@@ -196,6 +196,8 @@ export function getPingHeaders(): Record<string, string> | undefined {
 export async function collectPing(ping: CommonPingData, reason?: string): Promise<PingPayload | undefined> {
   // !IMPORTANT! Events data needs to be collected BEFORE other metrics,
   // because events collection may result in recording of error metrics.
+  log(LOG_TAG, ["before eventsDatabase.getPingEvents"], LoggingLevel.Info);
+  log(LOG_TAG, ["eventsDatabase type", typeof(Context.eventsDatabase)], LoggingLevel.Info);
   const eventsData = await Context.eventsDatabase.getPingEvents(ping.name, true);
   const metricsData = await Context.metricsDatabase.getPingMetrics(ping.name, true);
   if (!metricsData && !eventsData) {
